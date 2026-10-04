@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "path": "public/vendor/tessdata/tha.traineddata.gz",
+      "url": "https://raw.githubusercontent.com/naptha/tessdata/gh-pages/4.0.0/tha.traineddata.gz",
+      "sha256": "578c50034028340f2558fafb55207347943a60f4f1a854e5326ac272c764f7c3"
+    },
+    {
+      "path": "public/vendor/tessdata/eng.traineddata.gz",
+      "url": "https://raw.githubusercontent.com/naptha/tessdata/gh-pages/4.0.0/eng.traineddata.gz",
+      "sha256": "ed350f3752f81ee8f38769edc14d92d997dababe23b565c59879372cc46a2468"
+    },
+    {
+      "path": "public/fonts/Sarabun-Regular.ttf",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sarabun/Sarabun-Regular.ttf",
+      "sha256": "226d4f368fbc0457990ddef2692679badfd2c1a4e89e5ac4d43c10ba7743b2f1"
+    },
+    {
+      "path": "public/fonts/OFL.txt",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sarabun/OFL.txt",
+      "sha256": "b26cae1321380296ba8311b632a397d5eac11b47197f9d0aa0b9310f1531ad60"
+    }
+  ]
+}

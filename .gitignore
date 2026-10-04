@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+*.log
+.env*
+!.env.example
+public/vendor/
+public/fonts/
+.cache/
+checkpoints/
+rollback-recovery/
+playwright-report/
+test-results/

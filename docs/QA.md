@@ -11,7 +11,7 @@
 - ทดสอบ checkpoint/rollback ด้วย ZIP และ SHA-256 กู้ source ลงโฟลเดอร์ใหม่ และตรวจไฟล์กับ snapshot; ปฏิเสธ ZIP ที่ checksum ถูกแก้
 - สำเนาที่กู้คืนติดตั้ง `npm ci` และผ่าน `npm run verify` โดยดาวน์โหลด assets ใหม่ครบ ไม่อาศัย node_modules ของต้นฉบับ
 
-ไม่ได้ทดสอบ Safari/Firefox, การ deploy ภายนอก บนผู้ให้บริการภายนอก; GitHub CI จะตรวจเพิ่มหลัง push ผล OCR เป็นการตรวจว่า pipeline ทำงาน ไม่ใช่ benchmark ความแม่นยำภาษาไทย
+ไม่ได้ทดสอบ Safari/Firefox หรือ deploy เว็บไซต์บนผู้ให้บริการภายนอก GitHub CI จะตรวจเพิ่มหลัง push ผล OCR เป็นการตรวจว่า pipeline ทำงาน ไม่ใช่ benchmark ความแม่นยำภาษาไทย
 
 ## เอกสารสาธารณะที่หาและทดลองจริง
 

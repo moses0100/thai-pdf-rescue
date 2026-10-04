@@ -41,5 +41,5 @@ const extracted = spawnSync("tar", ["-xf", archive, "-C", destination], {
 if (extracted.status !== 0)
   throw new Error(extracted.stderr || "Archive extraction failed");
 console.log(
-  `Recovered commit ${manifest.commit} into:\n${destination}\nCurrent project was preserved. Run npm ci, npm run build in recovered thai-pdf-rescue to start it.`,
+  `Recovered commit ${manifest.commit} into:\n${destination}\nCurrent project was preserved. Run npm ci and npm run build in the recovered project directory to start it.`,
 );

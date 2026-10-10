@@ -151,12 +151,18 @@ export function analyzePage(raw: string, number: number): RescuePage {
 }
 
 export function safeFilename(name: string): string {
-  return (
-    name
-      .replace(/\.pdf$/i, "")
-      .replace(/[<>:"/\\|?*\x00-\x1f]/g, "_")
-      .slice(0, 100) || "document"
-  );
+  const cleaned = name
+    .trim()
+    .replace(/\.pdf$/i, "")
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, "_");
+  // Cut at Unicode code-point boundaries, then remove Windows trailing dots/spaces.
+  const stem =
+    Array.from(cleaned).slice(0, 100).join("").replace(/[. ]+$/u, "") ||
+    "document";
+  // Device names remain reserved even when followed by an extension.
+  return /^(con|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])(?:\.|$)/iu.test(stem)
+    ? `_${stem}`
+    : stem;
 }
 // Optional OCR cleanup: this also removes intentional spaces in Thai phrases.
 // Keep line boundaries, English words and numeric separators intact.

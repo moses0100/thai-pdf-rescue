@@ -63,3 +63,19 @@ test("export preserves page boundaries and safe filenames", () => {
   );
   assert.equal(safeFilename("../a.pdf"), ".._a");
 });
+test("download names handle Windows device names without changing ordinary Thai names", () => {
+  for (const name of ["CON.pdf", "aux.PDF", "COM1.pdf", "lpt9.pdf", "COM¹.pdf", "NUL.notes.pdf"]) {
+    assert.ok(safeFilename(name).startsWith("_"), name);
+  }
+  assert.equal(safeFilename("รายงานภาษาไทย.pdf"), "รายงานภาษาไทย");
+  assert.equal(safeFilename("CONTRACT.pdf"), "CONTRACT");
+  assert.equal(safeFilename("COM10.pdf"), "COM10");
+});
+test("download names remove empty/trailing stems and do not split emoji when truncating", () => {
+  assert.equal(safeFilename(" ... .pdf "), "document");
+  assert.equal(safeFilename("รายงาน. .pdf"), "รายงาน");
+  assert.equal(safeFilename(".pdf"), "document");
+  const name = "a".repeat(99) + "😀" + "tail.pdf";
+  assert.equal(safeFilename(name), "a".repeat(99) + "😀");
+  assert.equal(safeFilename('a<b>:c?.pdf'), "a_b__c_");
+});

@@ -46,10 +46,16 @@ export async function extractDocument(
   for (let number = 1; number <= pdf.numPages; number++) {
     if (cancelled()) throw new DOMException("Cancelled", "AbortError");
     const page = await pdf.getPage(number);
-    const content = await page.getTextContent();
-    const items = content.items.filter((item) => "str" in item);
-    pages.push(analyzePage(joinText(items), number));
-    page.cleanup();
+    try {
+      // Cancellation may happen while either PDF.js promise is pending.
+      if (cancelled()) throw new DOMException("Cancelled", "AbortError");
+      const content = await page.getTextContent();
+      if (cancelled()) throw new DOMException("Cancelled", "AbortError");
+      const items = content.items.filter((item) => "str" in item);
+      pages.push(analyzePage(joinText(items), number));
+    } finally {
+      page.cleanup();
+    }
     update(number, pdf.numPages);
   }
   return pages;

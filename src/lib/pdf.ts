@@ -67,22 +67,27 @@ export async function renderPage(
   desiredWidth = 1400,
 ): Promise<HTMLCanvasElement> {
   const page = await pdf.getPage(number);
-  const original = page.getViewport({ scale: 1 });
-  const scale = Math.min(
-    desiredWidth / original.width,
-    Math.sqrt(MAX_IMAGE_PIXELS / (original.width * original.height)),
-  );
-  const viewport = page.getViewport({ scale });
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(viewport.width));
-  canvas.height = Math.max(1, Math.round(viewport.height));
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("เบราว์เซอร์นี้ไม่รองรับ Canvas");
-  await page.render({
-    canvas,
-    canvasContext: context,
-    viewport,
-    background: "white",
-  }).promise;
-  return canvas;
+  try {
+    const original = page.getViewport({ scale: 1 });
+    const scale = Math.min(
+      desiredWidth / original.width,
+      Math.sqrt(MAX_IMAGE_PIXELS / (original.width * original.height)),
+    );
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(viewport.width));
+    canvas.height = Math.max(1, Math.round(viewport.height));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("เบราว์เซอร์นี้ไม่รองรับ Canvas");
+    await page.render({
+      canvas,
+      canvasContext: context,
+      viewport,
+      background: "white",
+    }).promise;
+    return canvas;
+  } finally {
+    // Keep resources until rendering settles, then release them on either outcome.
+    page.cleanup();
+  }
 }

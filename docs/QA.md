@@ -31,3 +31,12 @@ PDF public สถิติยังมีรหัสไม่รู้จัก
 | `checkpoint/pdf-rescue-release` | รุ่นพร้อมใช้และคู่มือ หลังตรวจสอบ |
 
 ไฟล์ backup อยู่ใน `checkpoints/` ไม่ขึ้น GitHub ปุ่ม checkpoint ในแอปเก็บเอกสารในเบราว์เซอร์ และแยกจาก Git checkpoints ข้างต้น
+
+
+## ตรวจเพดานภาพตัวอย่าง — 19 ตุลาคม 2569
+
+- แก้การปัดเศษขนาด canvas: หน้า 600 × 1601 หน่วยเคยได้ภาพ 1369 × 3653 = 5,000,957 พิกเซล เกินเพดาน 5 ล้านเล็กน้อย ตอนนี้ปัดลงและจำกัดด้านยาวเมื่อด้านสั้นเล็กกว่า 1 พิกเซล
+- เพิ่ม regression test ครอบคลุมหน้าสูง หน้ากว้าง อัตราส่วนสุดขั้ว และหน้าปกติ ตรวจขนาดจริงก่อนเรียก render และยืนยัน cleanup
+- ผ่าน unit tests 17 ข้อ, ESLint, TypeScript และ production build
+- Chrome browser tests ผ่าน 4 ข้อ รวม OCR จริงแบบ same-origin, checkpoint/restore, PDF เข้ารหัส, mobile และการยกเลิก OCR; ข้ามเอกสารสาธารณะ 2 ข้อตามค่าเริ่มต้น ไม่ได้ดาวน์โหลดซ้ำ
+- สำรองก่อนแก้: checkpoints/before-canvas-budget-20261019.zip ที่ commit 564682d; SHA-256 f24f26da18621b5f391b11a96ecc708e30be6a75564013b889105acbbcb1e537

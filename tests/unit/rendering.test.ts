@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { PDFDocumentProxy } from "pdfjs-dist";
+import { MAX_IMAGE_PIXELS } from "../../src/lib/recovery";
 import { renderPage } from "../../src/lib/pdf";
 
 async function withCanvas(canvas: object, run: () => Promise<void>) {
@@ -95,4 +96,43 @@ test("missing canvas support cleans the acquired page without starting rendering
     await assert.rejects(renderPage(pdf, 1), /Canvas/);
     assert.equal(cleaned, 1);
   });
+});
+
+test("canvas allocation stays within the pixel budget after integer sizing", async () => {
+  for (const [width, height, desiredWidth] of [
+    [600, 1601, 1400],
+    [600, 100, 10000],
+    [0.001, 1_000_000_000, 1400],
+    [600, 800, 1400],
+  ]) {
+    let cleaned = 0;
+    let rendered = false;
+    const canvas = { width: 0, height: 0, getContext: () => ({}) };
+    const pdf = {
+      getPage: async () => ({
+        getViewport: ({ scale }: { scale: number }) => ({
+          width: width * scale,
+          height: height * scale,
+        }),
+        render: () => {
+          rendered = true;
+          assert.ok(Number.isInteger(canvas.width) && canvas.width >= 1);
+          assert.ok(Number.isInteger(canvas.height) && canvas.height >= 1);
+          assert.ok(
+            canvas.width * canvas.height <= MAX_IMAGE_PIXELS,
+            `Allocated ${canvas.width} x ${canvas.height} for ${width} x ${height}`,
+          );
+          return { promise: Promise.resolve() };
+        },
+        cleanup: () => {
+          cleaned++;
+        },
+      }),
+    } as unknown as PDFDocumentProxy;
+    await withCanvas(canvas, async () => {
+      assert.equal(await renderPage(pdf, 1, desiredWidth), canvas);
+      assert.equal(rendered, true);
+      assert.equal(cleaned, 1);
+    });
+  }
 });

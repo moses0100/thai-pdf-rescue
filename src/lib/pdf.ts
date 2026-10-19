@@ -72,11 +72,13 @@ export async function renderPage(
     const scale = Math.min(
       desiredWidth / original.width,
       Math.sqrt(MAX_IMAGE_PIXELS / (original.width * original.height)),
+      // A subpixel short edge still needs a one-pixel canvas dimension.
+      MAX_IMAGE_PIXELS / Math.max(original.width, original.height),
     );
     const viewport = page.getViewport({ scale });
     const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(viewport.width));
-    canvas.height = Math.max(1, Math.round(viewport.height));
+    canvas.width = Math.max(1, Math.floor(viewport.width));
+    canvas.height = Math.max(1, Math.floor(viewport.height));
     const context = canvas.getContext("2d");
     if (!context) throw new Error("เบราว์เซอร์นี้ไม่รองรับ Canvas");
     await page.render({

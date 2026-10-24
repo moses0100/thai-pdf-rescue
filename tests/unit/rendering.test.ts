@@ -4,13 +4,18 @@ import type { PDFDocumentProxy } from "pdfjs-dist";
 import { MAX_IMAGE_PIXELS } from "../../src/lib/recovery";
 import { renderPage } from "../../src/lib/pdf";
 
-async function withCanvas(canvas: object, run: () => Promise<void>) {
+async function withCanvas(
+  canvas: object,
+  run: () => Promise<void>,
+  onCreate = () => {},
+) {
   const previous = Object.getOwnPropertyDescriptor(globalThis, "document");
   Object.defineProperty(globalThis, "document", {
     configurable: true,
     value: {
       createElement: (tag: string) => {
         assert.equal(tag, "canvas");
+        onCreate();
         return canvas;
       },
     },
@@ -134,5 +139,29 @@ test("canvas allocation stays within the pixel budget after integer sizing", asy
       assert.equal(rendered, true);
       assert.equal(cleaned, 1);
     });
+  }
+});
+
+test("invalid page dimensions reject before canvas allocation and still clean the page", async () => {
+  for (const [width, height, desiredWidth] of [
+    [0, 800, 1400], [-1, 800, 1400], [600, 0, 1400],
+    [600, Number.NaN, 1400], [Number.POSITIVE_INFINITY, 800, 1400],
+    [600, 800, 0], [600, 800, Number.POSITIVE_INFINITY],
+    [1e308, 1e308, 1400],
+  ]) {
+    let cleaned = 0;
+    let allocated = 0;
+    const pdf = {
+      getPage: async () => ({
+        getViewport: ({ scale }: { scale: number }) => ({ width: width * scale, height: height * scale }),
+        render: () => assert.fail("Invalid dimensions must not start rendering"),
+        cleanup: () => { cleaned++; },
+      }),
+    } as unknown as PDFDocumentProxy;
+    await withCanvas({ getContext: () => ({}) }, async () => {
+      await assert.rejects(renderPage(pdf, 1, desiredWidth), /ขนาด.*PDF/);
+      assert.equal(allocated, 0);
+      assert.equal(cleaned, 1);
+    }, () => { allocated++; });
   }
 });

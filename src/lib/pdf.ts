@@ -69,12 +69,20 @@ export async function renderPage(
   const page = await pdf.getPage(number);
   try {
     const original = page.getViewport({ scale: 1 });
+    if (
+      ![original.width, original.height, desiredWidth].every(
+        (value) => Number.isFinite(value) && value > 0,
+      )
+    ) throw new Error("ขนาดภาพหน้า PDF ไม่ถูกต้อง ไม่สามารถแสดงภาพได้");
     const scale = Math.min(
       desiredWidth / original.width,
       Math.sqrt(MAX_IMAGE_PIXELS / (original.width * original.height)),
       // A subpixel short edge still needs a one-pixel canvas dimension.
       MAX_IMAGE_PIXELS / Math.max(original.width, original.height),
     );
+    // Overflow in malformed page geometry can reduce the computed scale to zero.
+    if (!Number.isFinite(scale) || scale <= 0)
+      throw new Error("ขนาดภาพหน้า PDF ไม่ถูกต้อง ไม่สามารถแสดงภาพได้");
     const viewport = page.getViewport({ scale });
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.floor(viewport.width));
